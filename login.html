@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Login - RichGuin Buys Houses</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .font-inter { font-family: 'Inter', sans-serif; }
+        .font-poppins { font-family: 'Poppins', sans-serif; }
+
+        .gradient-richguin {
+            background: linear-gradient(135deg, #0d5c33 0%, #14935a 50%, #0a3d22 100%);
+        }
+
+        .text-gradient-richguin {
+            background: linear-gradient(135deg, #0d5c33, #14935a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'richguin-green': '#0d5c33',
+                        'richguin-light': '#14935a',
+                        'richguin-gold': '#d4af37',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-inter bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 min-h-screen">
+
+    <div class="min-h-screen flex items-center justify-center px-4 py-12">
+        <div class="max-w-md w-full">
+            <!-- Logo and Title -->
+            <div class="text-center mb-8">
+                <div class="flex items-center justify-center space-x-3 mb-4">
+                    <img src="https://i.imgur.com/92KhFmo.png" alt="RichGuin Buys Houses" class="h-16 w-auto">
+                    <h1 class="font-poppins text-3xl font-bold text-gradient-richguin">RichGuin</h1>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900 font-poppins">Dashboard Login</h2>
+                <p class="text-gray-600 mt-2">Access your seller leads and management tools</p>
+            </div>
+
+            <!-- Login Card -->
+            <div class="bg-white rounded-2xl shadow-2xl p-8 border border-gray-200">
+                <form id="loginForm">
+                    <div class="mb-6">
+                        <label for="email" class="block text-gray-700 font-semibold mb-2">Email Address</label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-richguin-green focus:border-transparent text-gray-900 transition"
+                            placeholder="Enter your email"
+                            required
+                        >
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="password" class="block text-gray-700 font-semibold mb-2">Password</label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-richguin-green focus:border-transparent text-gray-900 transition"
+                            placeholder="Enter your password"
+                            required
+                        >
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="flex items-center">
+                            <input type="checkbox" class="w-4 h-4 text-richguin-green border-gray-300 rounded focus:ring-richguin-green">
+                            <span class="ml-2 text-sm text-gray-600">Remember me</span>
+                        </label>
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="gradient-richguin w-full text-white py-3 rounded-lg font-bold text-lg hover:opacity-90 transition shadow-lg"
+                    >
+                        Sign In
+                    </button>
+
+                    <div id="errorMessage" class="mt-4 hidden">
+                        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                            <span id="errorText"></span>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 text-center">
+                        <a href="#" class="text-richguin-green hover:text-richguin-light text-sm font-medium">Forgot your password?</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Back to Home -->
+            <div class="text-center mt-6">
+                <a href="index.html" class="text-gray-600 hover:text-richguin-green transition font-medium">
+                    ← Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK v8 -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="js/firebase-config.js"></script>
+
+    <script>
+        // Initialize Firebase Auth
+        const auth = firebase.auth();
+
+        // Handle form submission
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            const submitButton = e.target.querySelector('button[type="submit"]');
+
+            // Hide previous errors
+            errorMessage.classList.add('hidden');
+
+            // Disable button and show loading state
+            submitButton.disabled = true;
+            submitButton.textContent = 'Signing In...';
+
+            try {
+                // Sign in with Firebase Auth
+                await auth.signInWithEmailAndPassword(email, password);
+
+                // Redirect to dashboard
+                window.location.href = 'dashboard.html';
+            } catch (error) {
+                // Show error message
+                errorMessage.classList.remove('hidden');
+
+                let errorMsg = 'An error occurred. Please try again.';
+
+                switch (error.code) {
+                    case 'auth/invalid-email':
+                        errorMsg = 'Invalid email address.';
+                        break;
+                    case 'auth/user-disabled':
+                        errorMsg = 'This account has been disabled.';
+                        break;
+                    case 'auth/user-not-found':
+                        errorMsg = 'No account found with this email.';
+                        break;
+                    case 'auth/wrong-password':
+                        errorMsg = 'Incorrect password.';
+                        break;
+                    case 'auth/invalid-credential':
+                        errorMsg = 'Invalid email or password.';
+                        break;
+                }
+
+                errorText.textContent = errorMsg;
+
+                // Re-enable button
+                submitButton.disabled = false;
+                submitButton.textContent = 'Sign In';
+            }
+        });
+
+        // Check if user is already logged in
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // User is signed in, redirect to dashboard
+                window.location.href = 'dashboard.html';
+            }
+        });
+    </script>
+</body>
+</html>
