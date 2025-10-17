@@ -591,8 +591,12 @@
                         source: 'website'
                     };
 
+                    console.log('Submitting form data:', formData);
+
                     // Save to Firestore
-                    await db.collection('SellerLeads').add(formData);
+                    const docRef = await db.collection('SellerLeads').add(formData);
+
+                    console.log('Lead submitted successfully with ID:', docRef.id);
 
                     // Show success message
                     alert('Thank you! We\'ve received your information and will contact you within 24 hours.');
@@ -612,6 +616,8 @@
                     button.textContent = originalText;
                 }
             });
+        } else {
+            console.warn('Form not found on page');
         }
     </script>
 </body>
