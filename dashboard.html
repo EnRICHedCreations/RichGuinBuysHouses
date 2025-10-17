@@ -421,7 +421,7 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                             <div class="flex gap-2">
-                                <button onclick='viewLead(${JSON.stringify(lead).replace(/'/g, "&#39;")})' class="text-blue-600 hover:text-blue-800 transition" title="View">
+                                <button onclick="viewLead('${lead.id}')" class="text-blue-600 hover:text-blue-800 transition" title="View">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
@@ -446,63 +446,78 @@
 
         // Modal state
         let currentLeadId = null;
+        let allLeads = []; // Store all leads globally
 
         // View Lead Modal
-        function viewLead(lead) {
+        async function viewLead(leadId) {
             const modal = document.getElementById('viewModal');
             const content = document.getElementById('viewModalContent');
 
-            const date = lead.timestamp ? lead.timestamp.toDate().toLocaleString() : 'N/A';
-            const status = lead.status || 'New';
-            const statusColors = {
-                'New': 'bg-blue-100 text-blue-800',
-                'Contacted': 'bg-purple-100 text-purple-800',
-                'Qualified': 'bg-green-100 text-green-800',
-                'Offer Made': 'bg-yellow-100 text-yellow-800',
-                'Under Contract': 'bg-orange-100 text-orange-800',
-                'Closed': 'bg-emerald-100 text-emerald-800',
-                'Lost': 'bg-red-100 text-red-800'
-            };
-            const statusColor = statusColors[status] || 'bg-gray-100 text-gray-800';
+            try {
+                // Fetch the lead from Firestore
+                const leadDoc = await db.collection('SellerLeads').doc(leadId).get();
 
-            content.innerHTML = `
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <p class="text-sm font-semibold text-gray-600">Name</p>
-                        <p class="text-lg text-gray-900">${lead.name || 'N/A'}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm font-semibold text-gray-600">Status</p>
-                        <span class="inline-block px-3 py-1 text-sm font-semibold rounded-full ${statusColor}">${status}</span>
-                    </div>
-                    <div>
-                        <p class="text-sm font-semibold text-gray-600">Phone</p>
-                        <a href="tel:${lead.phone}" class="text-lg text-richguin-green hover:text-richguin-light">${lead.phone || 'N/A'}</a>
-                    </div>
-                    <div>
-                        <p class="text-sm font-semibold text-gray-600">Email</p>
-                        <a href="mailto:${lead.email}" class="text-lg text-richguin-green hover:text-richguin-light break-all">${lead.email || 'N/A'}</a>
-                    </div>
-                    <div class="col-span-2">
-                        <p class="text-sm font-semibold text-gray-600">Property Address</p>
-                        <p class="text-lg text-gray-900">${lead.address || 'N/A'}</p>
-                    </div>
-                    <div class="col-span-2">
-                        <p class="text-sm font-semibold text-gray-600">Details</p>
-                        <p class="text-gray-900">${lead.details || 'No additional details provided'}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm font-semibold text-gray-600">Source</p>
-                        <p class="text-gray-900">${lead.source || 'N/A'}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm font-semibold text-gray-600">Submitted</p>
-                        <p class="text-gray-900">${date}</p>
-                    </div>
-                </div>
-            `;
+                if (!leadDoc.exists) {
+                    alert('Lead not found');
+                    return;
+                }
 
-            modal.classList.remove('hidden');
+                const lead = leadDoc.data();
+                const date = lead.timestamp ? lead.timestamp.toDate().toLocaleString() : 'N/A';
+                const status = lead.status || 'New';
+                const statusColors = {
+                    'New': 'bg-blue-100 text-blue-800',
+                    'Contacted': 'bg-purple-100 text-purple-800',
+                    'Qualified': 'bg-green-100 text-green-800',
+                    'Offer Made': 'bg-yellow-100 text-yellow-800',
+                    'Under Contract': 'bg-orange-100 text-orange-800',
+                    'Closed': 'bg-emerald-100 text-emerald-800',
+                    'Lost': 'bg-red-100 text-red-800'
+                };
+                const statusColor = statusColors[status] || 'bg-gray-100 text-gray-800';
+
+                content.innerHTML = `
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-sm font-semibold text-gray-600">Name</p>
+                            <p class="text-lg text-gray-900">${lead.name || 'N/A'}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-gray-600">Status</p>
+                            <span class="inline-block px-3 py-1 text-sm font-semibold rounded-full ${statusColor}">${status}</span>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-gray-600">Phone</p>
+                            <a href="tel:${lead.phone}" class="text-lg text-richguin-green hover:text-richguin-light">${lead.phone || 'N/A'}</a>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-gray-600">Email</p>
+                            <a href="mailto:${lead.email}" class="text-lg text-richguin-green hover:text-richguin-light break-all">${lead.email || 'N/A'}</a>
+                        </div>
+                        <div class="col-span-2">
+                            <p class="text-sm font-semibold text-gray-600">Property Address</p>
+                            <p class="text-lg text-gray-900">${lead.address || 'N/A'}</p>
+                        </div>
+                        <div class="col-span-2">
+                            <p class="text-sm font-semibold text-gray-600">Details</p>
+                            <p class="text-gray-900">${lead.details || 'No additional details provided'}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-gray-600">Source</p>
+                            <p class="text-gray-900">${lead.source || 'N/A'}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-gray-600">Submitted</p>
+                            <p class="text-gray-900">${date}</p>
+                        </div>
+                    </div>
+                `;
+
+                modal.classList.remove('hidden');
+            } catch (error) {
+                console.error('Error viewing lead:', error);
+                alert('Error loading lead details. Please try again.');
+            }
         }
 
         function closeViewModal() {
