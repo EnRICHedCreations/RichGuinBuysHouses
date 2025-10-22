@@ -26,6 +26,30 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+
+        .tab-active {
+            border-bottom: 3px solid #14935a;
+            color: #0d5c33;
+            font-weight: 700;
+        }
+
+        .pipeline-card {
+            transition: all 0.3s ease;
+        }
+
+        .pipeline-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .follow-up-overdue {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
     </style>
     <script>
         tailwind.config = {
@@ -64,115 +88,280 @@
         </div>
     </nav>
 
+    <!-- Tab Navigation -->
+    <div class="bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav class="flex space-x-8">
+                <button onclick="switchTab('leads')" id="tabLeads" class="tab-active py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-semibold transition">
+                    📋 Seller Leads
+                </button>
+                <button onclick="switchTab('pipeline')" id="tabPipeline" class="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-semibold transition">
+                    🔄 Deal Pipeline
+                </button>
+            </nav>
+        </div>
+    </div>
+
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Stats Overview -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm text-gray-600 font-medium">Total Leads</p>
-                        <p id="totalLeads" class="text-3xl font-bold text-richguin-green mt-1">0</p>
+        <!-- LEADS TAB -->
+        <div id="leadsTab">
+            <!-- Stats Overview -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 font-medium">Total Leads</p>
+                            <p id="totalLeads" class="text-3xl font-bold text-richguin-green mt-1">0</p>
+                        </div>
+                        <div class="w-12 h-12 gradient-richguin rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                        </div>
                     </div>
-                    <div class="w-12 h-12 gradient-richguin rounded-lg flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                        </svg>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 font-medium">New Today</p>
+                            <p id="todayLeads" class="text-3xl font-bold text-emerald-600 mt-1">0</p>
+                        </div>
+                        <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 font-medium">This Week</p>
+                            <p id="weekLeads" class="text-3xl font-bold text-blue-600 mt-1">0</p>
+                        </div>
+                        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 font-medium">This Month</p>
+                            <p id="monthLeads" class="text-3xl font-bold text-richguin-gold mt-1">0</p>
+                        </div>
+                        <div class="w-12 h-12 gradient-accent rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm text-gray-600 font-medium">New Today</p>
-                        <p id="todayLeads" class="text-3xl font-bold text-emerald-600 mt-1">0</p>
-                    </div>
-                    <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-lg flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm text-gray-600 font-medium">This Week</p>
-                        <p id="weekLeads" class="text-3xl font-bold text-blue-600 mt-1">0</p>
-                    </div>
-                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                        </svg>
+            <!-- Seller Leads Table -->
+            <div class="bg-white rounded-xl shadow-md border border-gray-200">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900 font-poppins">Seller Leads</h2>
+                            <p class="text-gray-600 mt-1">Manage your incoming property leads</p>
+                        </div>
+                        <button id="refreshBtn" class="gradient-richguin text-white px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            </svg>
+                            Refresh
+                        </button>
                     </div>
                 </div>
-            </div>
 
-            <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm text-gray-600 font-medium">This Month</p>
-                        <p id="monthLeads" class="text-3xl font-bold text-richguin-gold mt-1">0</p>
-                    </div>
-                    <div class="w-12 h-12 gradient-accent rounded-lg flex items-center justify-center">
-                        <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                        </svg>
-                    </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 border-b border-gray-200">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Date</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Name</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Phone</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Email</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Property Address</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leadsTableBody" class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td colspan="7" class="px-6 py-12 text-center">
+                                    <div class="flex flex-col items-center justify-center">
+                                        <svg class="w-12 h-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                        </svg>
+                                        <p class="text-gray-500 font-medium">Loading leads...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
-        <!-- Seller Leads Table -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-200">
-            <div class="p-6 border-b border-gray-200">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h2 class="text-2xl font-bold text-gray-900 font-poppins">Seller Leads</h2>
-                        <p class="text-gray-600 mt-1">Manage your incoming property leads</p>
-                    </div>
-                    <button id="refreshBtn" class="gradient-richguin text-white px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                        </svg>
-                        Refresh
-                    </button>
+        <!-- PIPELINE TAB -->
+        <div id="pipelineTab" class="hidden">
+            <!-- Pipeline Header -->
+            <div class="mb-6 flex justify-between items-center">
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-900 font-poppins">Deal Pipeline</h2>
+                    <p class="text-gray-600 mt-1">Track calls, follow-ups, and deal progress</p>
                 </div>
+                <button onclick="openLogCallModal()" class="gradient-richguin text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                    </svg>
+                    Log Call
+                </button>
             </div>
 
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-gray-50 border-b border-gray-200">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Date</th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Name</th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Phone</th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Email</th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Property Address</th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="leadsTableBody" class="bg-white divide-y divide-gray-200">
-                        <tr>
-                            <td colspan="7" class="px-6 py-12 text-center">
-                                <div class="flex flex-col items-center justify-center">
-                                    <svg class="w-12 h-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                    </svg>
-                                    <p class="text-gray-500 font-medium">Loading leads...</p>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <!-- Follow-Up Reminders -->
+            <div id="followUpReminders" class="mb-8"></div>
+
+            <!-- Pipeline Kanban Board -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <!-- New Contact Column -->
+                <div class="bg-gray-100 rounded-lg p-4">
+                    <h3 class="font-bold text-gray-700 mb-4 flex items-center gap-2">
+                        <span class="w-3 h-3 bg-blue-500 rounded-full"></span>
+                        New Contact
+                        <span id="countNew" class="ml-auto bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded-full">0</span>
+                    </h3>
+                    <div id="pipelineNew" class="space-y-3"></div>
+                </div>
+
+                <!-- Initial Offer Column -->
+                <div class="bg-gray-100 rounded-lg p-4">
+                    <h3 class="font-bold text-gray-700 mb-4 flex items-center gap-2">
+                        <span class="w-3 h-3 bg-yellow-500 rounded-full"></span>
+                        Initial Offer
+                        <span id="countOffer" class="ml-auto bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-1 rounded-full">0</span>
+                    </h3>
+                    <div id="pipelineOffer" class="space-y-3"></div>
+                </div>
+
+                <!-- Follow Up Column -->
+                <div class="bg-gray-100 rounded-lg p-4">
+                    <h3 class="font-bold text-gray-700 mb-4 flex items-center gap-2">
+                        <span class="w-3 h-3 bg-purple-500 rounded-full"></span>
+                        Follow Up
+                        <span id="countFollowUp" class="ml-auto bg-purple-100 text-purple-800 text-xs font-bold px-2 py-1 rounded-full">0</span>
+                    </h3>
+                    <div id="pipelineFollowUp" class="space-y-3"></div>
+                </div>
+
+                <!-- Under Contract Column -->
+                <div class="bg-gray-100 rounded-lg p-4">
+                    <h3 class="font-bold text-gray-700 mb-4 flex items-center gap-2">
+                        <span class="w-3 h-3 bg-green-500 rounded-full"></span>
+                        Under Contract
+                        <span id="countContract" class="ml-auto bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full">0</span>
+                    </h3>
+                    <div id="pipelineContract" class="space-y-3"></div>
+                </div>
             </div>
         </div>
     </main>
 
-    <!-- View Lead Modal -->
+    <!-- Log Call Modal -->
+    <div id="logCallModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="gradient-richguin p-6 rounded-t-2xl">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-2xl font-bold text-white font-poppins">Log Call</h3>
+                    <button onclick="closeLogCallModal()" class="text-white hover:text-gray-200 transition">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Select Lead</label>
+                    <select id="callLeadSelect" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-richguin-green focus:border-transparent">
+                        <option value="">Select a lead...</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Call Outcome</label>
+                    <select id="callOutcome" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-richguin-green focus:border-transparent">
+                        <option value="No Answer">No Answer</option>
+                        <option value="Left Voicemail">Left Voicemail</option>
+                        <option value="Spoke - Not Interested">Spoke - Not Interested</option>
+                        <option value="Spoke - Needs Info">Spoke - Needs Info</option>
+                        <option value="Made Offer">Made Offer</option>
+                        <option value="Needs Follow Up">Needs Follow Up</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Offer Amount (if made)</label>
+                    <input type="number" id="offerAmount" placeholder="$0" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-richguin-green focus:border-transparent">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Their Response / Objections</label>
+                    <textarea id="callObjections" rows="3" placeholder="e.g., 'Too low, needs $50k more', 'Wants to think about it', etc." class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-richguin-green focus:border-transparent"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Call Notes / Remarks</label>
+                    <textarea id="callNotes" rows="4" placeholder="Detailed notes about the conversation..." class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-richguin-green focus:border-transparent"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Follow Up Date</label>
+                    <input type="date" id="followUpDate" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-richguin-green focus:border-transparent">
+                    <p class="text-sm text-gray-500 mt-1">Set a reminder to call them back</p>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button onclick="saveCall()" class="gradient-richguin text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition flex-1">
+                        Save Call Log
+                    </button>
+                    <button onclick="closeLogCallModal()" class="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Deal Modal -->
+    <div id="viewDealModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="gradient-richguin p-6 rounded-t-2xl">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-2xl font-bold text-white font-poppins">Deal History</h3>
+                    <button onclick="closeViewDealModal()" class="text-white hover:text-gray-200 transition">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div id="viewDealContent" class="p-6">
+                <!-- Content will be dynamically loaded -->
+            </div>
+        </div>
+    </div>
+
+    <!-- View Lead Modal (existing) -->
     <div id="viewModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
             <div class="gradient-richguin p-6 rounded-t-2xl">
@@ -191,7 +380,7 @@
         </div>
     </div>
 
-    <!-- Edit Status Modal -->
+    <!-- Edit Status Modal (existing) -->
     <div id="statusModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl">
             <div class="gradient-richguin p-6 rounded-t-2xl">
@@ -227,7 +416,40 @@
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
+    <!-- Edit Deal Stage Modal -->
+    <div id="dealStageModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl">
+            <div class="gradient-richguin p-6 rounded-t-2xl">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-2xl font-bold text-white font-poppins">Update Deal Stage</h3>
+                    <button onclick="closeDealStageModal()" class="text-white hover:text-gray-200 transition">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <label class="block text-gray-700 font-semibold mb-2">Deal Stage</label>
+                <select id="dealStageSelect" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-richguin-green focus:border-transparent text-gray-900">
+                    <option value="New Contact">New Contact</option>
+                    <option value="Initial Offer">Initial Offer</option>
+                    <option value="Follow Up">Follow Up</option>
+                    <option value="Under Contract">Under Contract</option>
+                </select>
+                <div class="mt-6 flex gap-3">
+                    <button onclick="saveDealStage()" class="gradient-richguin text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition flex-1">
+                        Save Stage
+                    </button>
+                    <button onclick="closeDealStageModal()" class="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal (existing) -->
     <div id="deleteModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl">
             <div class="bg-gradient-to-br from-red-600 to-red-700 p-6 rounded-t-2xl">
@@ -262,23 +484,22 @@
 
     <script>
         const auth = firebase.auth();
-        // db is already initialized in firebase-config.js
+        let allLeads = [];
+        let currentLeadId = null;
+        let currentDealId = null;
 
         // Check authentication
         auth.onAuthStateChanged((user) => {
             if (!user) {
-                // User is not signed in, redirect to login
                 window.location.href = 'login.html';
             } else {
-                // Display user email
                 document.getElementById('userEmail').textContent = user.email;
-
-                // Load leads
                 loadLeads();
+                loadPipeline();
             }
         });
 
-        // Logout functionality
+        // Logout
         document.getElementById('logoutBtn').addEventListener('click', async () => {
             try {
                 await auth.signOut();
@@ -288,6 +509,22 @@
                 alert('Error signing out. Please try again.');
             }
         });
+
+        // Tab Switching
+        function switchTab(tab) {
+            document.querySelectorAll('[id^="tab"]').forEach(btn => btn.classList.remove('tab-active'));
+
+            if (tab === 'leads') {
+                document.getElementById('tabLeads').classList.add('tab-active');
+                document.getElementById('leadsTab').classList.remove('hidden');
+                document.getElementById('pipelineTab').classList.add('hidden');
+            } else if (tab === 'pipeline') {
+                document.getElementById('tabPipeline').classList.add('tab-active');
+                document.getElementById('leadsTab').classList.add('hidden');
+                document.getElementById('pipelineTab').classList.remove('hidden');
+                loadPipeline();
+            }
+        }
 
         // Refresh button
         document.getElementById('refreshBtn').addEventListener('click', () => {
@@ -299,7 +536,6 @@
             try {
                 console.log('Loading leads from Firestore...');
 
-                // Try to get leads with ordering
                 let leadsSnapshot;
                 try {
                     leadsSnapshot = await db.collection('SellerLeads')
@@ -307,7 +543,6 @@
                         .get();
                 } catch (orderError) {
                     console.warn('Could not order by timestamp, fetching without ordering:', orderError);
-                    // If ordering fails (no index), just get all documents
                     leadsSnapshot = await db.collection('SellerLeads').get();
                 }
 
@@ -317,18 +552,17 @@
                     leads.push({ id: doc.id, ...doc.data() });
                 });
 
+                allLeads = leads;
                 console.log(`Total leads found: ${leads.length}`);
 
-                // Update stats
                 updateStats(leads);
-
-                // Display leads in table
                 displayLeads(leads);
+                populateLeadSelect(leads);
             } catch (error) {
                 console.error('Error loading leads:', error);
                 document.getElementById('leadsTableBody').innerHTML = `
                     <tr>
-                        <td colspan="6" class="px-6 py-12 text-center">
+                        <td colspan="7" class="px-6 py-12 text-center">
                             <p class="text-red-600 font-medium">Error loading leads: ${error.message}</p>
                             <p class="text-gray-500 text-sm mt-2">Check browser console for details</p>
                         </td>
@@ -393,7 +627,6 @@
                 const address = lead.address || 'N/A';
                 const status = lead.status || 'New';
 
-                // Status badge colors
                 const statusColors = {
                     'New': 'bg-blue-100 text-blue-800',
                     'Contacted': 'bg-purple-100 text-purple-800',
@@ -444,17 +677,306 @@
             }).join('');
         }
 
-        // Modal state
-        let currentLeadId = null;
-        let allLeads = []; // Store all leads globally
+        // Populate lead select dropdown
+        function populateLeadSelect(leads) {
+            const select = document.getElementById('callLeadSelect');
+            select.innerHTML = '<option value="">Select a lead...</option>' +
+                leads.map(lead => `<option value="${lead.id}">${lead.name} - ${lead.address}</option>`).join('');
+        }
 
-        // View Lead Modal
+        // PIPELINE FUNCTIONS
+        async function loadPipeline() {
+            try {
+                const dealsSnapshot = await db.collection('DealPipeline').get();
+                const deals = [];
+                dealsSnapshot.forEach(doc => {
+                    deals.push({ id: doc.id, ...doc.data() });
+                });
+
+                renderPipeline(deals);
+                renderFollowUpReminders(deals);
+            } catch (error) {
+                console.error('Error loading pipeline:', error);
+            }
+        }
+
+        function renderPipeline(deals) {
+            const columns = {
+                'New Contact': document.getElementById('pipelineNew'),
+                'Initial Offer': document.getElementById('pipelineOffer'),
+                'Follow Up': document.getElementById('pipelineFollowUp'),
+                'Under Contract': document.getElementById('pipelineContract')
+            };
+
+            // Clear columns
+            Object.values(columns).forEach(col => col.innerHTML = '');
+
+            // Count deals per stage
+            const counts = {
+                'New Contact': 0,
+                'Initial Offer': 0,
+                'Follow Up': 0,
+                'Under Contract': 0
+            };
+
+            deals.forEach(deal => {
+                const stage = deal.stage || 'New Contact';
+                counts[stage]++;
+
+                const column = columns[stage];
+                if (!column) return;
+
+                const card = document.createElement('div');
+                card.className = 'pipeline-card bg-white rounded-lg p-4 shadow-md border-l-4 cursor-pointer';
+
+                if (stage === 'New Contact') card.style.borderLeftColor = '#3b82f6';
+                else if (stage === 'Initial Offer') card.style.borderLeftColor = '#eab308';
+                else if (stage === 'Follow Up') card.style.borderLeftColor = '#a855f7';
+                else if (stage === 'Under Contract') card.style.borderLeftColor = '#22c55e';
+
+                const lastCall = deal.calls && deal.calls.length > 0 ? deal.calls[deal.calls.length - 1] : null;
+                const callDate = lastCall && lastCall.timestamp ? new Date(lastCall.timestamp).toLocaleDateString() : 'Never';
+
+                card.innerHTML = `
+                    <div class="font-bold text-gray-800 mb-1">${deal.leadName || 'Unknown'}</div>
+                    <div class="text-sm text-gray-600 mb-2">${deal.address || 'No address'}</div>
+                    ${deal.offerAmount ? `<div class="text-sm font-semibold text-green-600 mb-1">Offer: $${parseInt(deal.offerAmount).toLocaleString()}</div>` : ''}
+                    ${deal.followUpDate ? `<div class="text-xs text-purple-600 font-medium">📅 Follow up: ${new Date(deal.followUpDate).toLocaleDateString()}</div>` : ''}
+                    <div class="text-xs text-gray-500 mt-2">Last call: ${callDate}</div>
+                `;
+
+                card.onclick = () => viewDeal(deal.id);
+                column.appendChild(card);
+            });
+
+            // Update counts
+            document.getElementById('countNew').textContent = counts['New Contact'];
+            document.getElementById('countOffer').textContent = counts['Initial Offer'];
+            document.getElementById('countFollowUp').textContent = counts['Follow Up'];
+            document.getElementById('countContract').textContent = counts['Under Contract'];
+        }
+
+        function renderFollowUpReminders(deals) {
+            const container = document.getElementById('followUpReminders');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const overdueDeals = deals.filter(deal => {
+                if (!deal.followUpDate) return false;
+                const followUpDate = new Date(deal.followUpDate);
+                followUpDate.setHours(0, 0, 0, 0);
+                return followUpDate <= today;
+            });
+
+            if (overdueDeals.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg follow-up-overdue">
+                    <div class="flex items-center mb-2">
+                        <svg class="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                        </svg>
+                        <h3 class="font-bold text-red-800">Follow-Up Reminders (${overdueDeals.length})</h3>
+                    </div>
+                    <div class="space-y-2">
+                        ${overdueDeals.map(deal => `
+                            <div class="bg-white p-3 rounded border border-red-200 flex justify-between items-center cursor-pointer hover:bg-red-50 transition" onclick="viewDeal('${deal.id}')">
+                                <div>
+                                    <div class="font-semibold text-gray-800">${deal.leadName || 'Unknown'}</div>
+                                    <div class="text-sm text-gray-600">${deal.address || 'No address'}</div>
+                                </div>
+                                <div class="text-sm font-medium text-red-600">Due: ${new Date(deal.followUpDate).toLocaleDateString()}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Log Call Modal
+        function openLogCallModal() {
+            document.getElementById('logCallModal').classList.remove('hidden');
+        }
+
+        function closeLogCallModal() {
+            document.getElementById('logCallModal').classList.add('hidden');
+            document.getElementById('callLeadSelect').value = '';
+            document.getElementById('callOutcome').value = 'No Answer';
+            document.getElementById('offerAmount').value = '';
+            document.getElementById('callObjections').value = '';
+            document.getElementById('callNotes').value = '';
+            document.getElementById('followUpDate').value = '';
+        }
+
+        async function saveCall() {
+            const leadId = document.getElementById('callLeadSelect').value;
+            const outcome = document.getElementById('callOutcome').value;
+            const offerAmount = document.getElementById('offerAmount').value;
+            const objections = document.getElementById('callObjections').value;
+            const notes = document.getElementById('callNotes').value;
+            const followUpDate = document.getElementById('followUpDate').value;
+
+            if (!leadId) {
+                alert('Please select a lead');
+                return;
+            }
+
+            try {
+                const lead = allLeads.find(l => l.id === leadId);
+
+                if (!lead) {
+                    alert('Lead not found. Please refresh the page and try again.');
+                    return;
+                }
+
+                // Determine stage based on outcome
+                let stage = 'New Contact';
+                if (outcome === 'Made Offer') stage = 'Initial Offer';
+                else if (outcome === 'Needs Follow Up') stage = 'Follow Up';
+
+                const callLog = {
+                    timestamp: new Date().toISOString(),
+                    outcome,
+                    offerAmount: offerAmount || null,
+                    objections,
+                    notes
+                };
+
+                // Check if deal exists in pipeline
+                const dealQuery = await db.collection('DealPipeline').where('leadId', '==', leadId).get();
+
+                if (dealQuery.empty) {
+                    // Create new deal
+                    await db.collection('DealPipeline').add({
+                        leadId,
+                        leadName: lead.name,
+                        phone: lead.phone,
+                        address: lead.address,
+                        stage,
+                        calls: [callLog],
+                        offerAmount: offerAmount || null,
+                        followUpDate: followUpDate || null,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } else {
+                    // Update existing deal
+                    const dealDoc = dealQuery.docs[0];
+                    await db.collection('DealPipeline').doc(dealDoc.id).update({
+                        stage,
+                        calls: firebase.firestore.FieldValue.arrayUnion(callLog),
+                        offerAmount: offerAmount || dealDoc.data().offerAmount,
+                        followUpDate: followUpDate || dealDoc.data().followUpDate,
+                        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+
+                closeLogCallModal();
+                loadPipeline();
+                alert('Call logged successfully!');
+            } catch (error) {
+                console.error('Error saving call:', error);
+                console.error('Error details:', error.code, error.message);
+
+                if (error.code === 'permission-denied') {
+                    alert('⚠️ PERMISSION DENIED\n\nYou need to update Firebase Security Rules:\n\n1. Go to Firebase Console\n2. Firestore Database → Rules\n3. Copy rules from PASTE.txt\n4. Publish the rules\n\nError: ' + error.message);
+                } else {
+                    alert('Error saving call: ' + error.message + '\n\nCheck browser console for details.');
+                }
+            }
+        }
+
+        // View Deal Modal
+        async function viewDeal(dealId) {
+            try {
+                const dealDoc = await db.collection('DealPipeline').doc(dealId).get();
+                if (!dealDoc.exists) {
+                    alert('Deal not found');
+                    return;
+                }
+
+                const deal = dealDoc.data();
+                const content = document.getElementById('viewDealContent');
+
+                const callHistory = deal.calls || [];
+
+                content.innerHTML = `
+                    <div class="space-y-6">
+                        <div class="grid grid-cols-2 gap-4 pb-4 border-b border-gray-200">
+                            <div>
+                                <p class="text-sm font-semibold text-gray-600">Contact</p>
+                                <p class="text-lg font-bold text-gray-900">${deal.leadName || 'Unknown'}</p>
+                                <a href="tel:${deal.phone}" class="text-richguin-green hover:text-richguin-light">${deal.phone || 'N/A'}</a>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-600">Property</p>
+                                <p class="text-gray-900">${deal.address || 'No address'}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-600">Current Stage</p>
+                                <div class="flex items-center gap-2">
+                                    <p class="font-bold text-richguin-green">${deal.stage || 'New Contact'}</p>
+                                    <button onclick="editDealStage('${dealDoc.id}', '${deal.stage || 'New Contact'}')" class="text-blue-600 hover:text-blue-800 transition" title="Edit Stage">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-600">Offer Amount</p>
+                                <p class="text-lg font-bold text-green-600">${deal.offerAmount ? '$' + parseInt(deal.offerAmount).toLocaleString() : 'None'}</p>
+                            </div>
+                            ${deal.followUpDate ? `
+                                <div class="col-span-2">
+                                    <p class="text-sm font-semibold text-gray-600">Follow Up Date</p>
+                                    <p class="text-lg font-semibold text-purple-600">${new Date(deal.followUpDate).toLocaleDateString()}</p>
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <div>
+                            <h4 class="text-xl font-bold text-gray-900 mb-4">Call History (${callHistory.length})</h4>
+                            <div class="space-y-4">
+                                ${callHistory.length === 0 ? '<p class="text-gray-500">No calls logged yet</p>' : ''}
+                                ${callHistory.map((call, index) => `
+                                    <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <div class="font-semibold text-gray-900">Call #${callHistory.length - index}</div>
+                                            <div class="text-sm text-gray-600">${call.timestamp ? new Date(call.timestamp).toLocaleString() : 'Unknown date'}</div>
+                                        </div>
+                                        <div class="space-y-2">
+                                            <div><span class="font-semibold">Outcome:</span> <span class="text-gray-800">${call.outcome || 'N/A'}</span></div>
+                                            ${call.offerAmount ? `<div><span class="font-semibold">Offer:</span> <span class="text-green-600 font-bold">$${parseInt(call.offerAmount).toLocaleString()}</span></div>` : ''}
+                                            ${call.objections ? `<div><span class="font-semibold">Objections:</span> <span class="text-gray-800">${call.objections}</span></div>` : ''}
+                                            ${call.notes ? `<div><span class="font-semibold">Notes:</span> <span class="text-gray-800">${call.notes}</span></div>` : ''}
+                                        </div>
+                                    </div>
+                                `).reverse().join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('viewDealModal').classList.remove('hidden');
+            } catch (error) {
+                console.error('Error viewing deal:', error);
+                alert('Error loading deal details');
+            }
+        }
+
+        function closeViewDealModal() {
+            document.getElementById('viewDealModal').classList.add('hidden');
+        }
+
+        // View Lead Modal (existing functionality)
         async function viewLead(leadId) {
             const modal = document.getElementById('viewModal');
             const content = document.getElementById('viewModalContent');
 
             try {
-                // Fetch the lead from Firestore
                 const leadDoc = await db.collection('SellerLeads').doc(leadId).get();
 
                 if (!leadDoc.exists) {
@@ -524,7 +1046,7 @@
             document.getElementById('viewModal').classList.add('hidden');
         }
 
-        // Edit Status Modal
+        // Edit Status Modal (existing functionality)
         function editStatus(leadId, currentStatus) {
             currentLeadId = leadId;
             document.getElementById('statusSelect').value = currentStatus;
@@ -553,7 +1075,6 @@
                 closeStatusModal();
                 loadLeads();
 
-                // Show success message
                 alert('Status updated successfully!');
             } catch (error) {
                 console.error('Error updating status:', error);
@@ -564,7 +1085,7 @@
             }
         }
 
-        // Delete Lead Modal
+        // Delete Lead Modal (existing functionality)
         function deleteLead(leadId) {
             currentLeadId = leadId;
             document.getElementById('deleteModal').classList.remove('hidden');
@@ -588,7 +1109,6 @@
                 closeDeleteModal();
                 loadLeads();
 
-                // Show success message
                 alert('Lead deleted successfully!');
             } catch (error) {
                 console.error('Error deleting lead:', error);
@@ -599,12 +1119,55 @@
             }
         }
 
+        // Edit Deal Stage Modal
+        function editDealStage(dealId, currentStage) {
+            currentDealId = dealId;
+            document.getElementById('dealStageSelect').value = currentStage;
+            document.getElementById('dealStageModal').classList.remove('hidden');
+        }
+
+        function closeDealStageModal() {
+            document.getElementById('dealStageModal').classList.add('hidden');
+            currentDealId = null;
+        }
+
+        async function saveDealStage() {
+            if (!currentDealId) return;
+
+            const newStage = document.getElementById('dealStageSelect').value;
+            const button = event.target;
+            button.disabled = true;
+            button.textContent = 'Saving...';
+
+            try {
+                await db.collection('DealPipeline').doc(currentDealId).update({
+                    stage: newStage,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                closeDealStageModal();
+                closeViewDealModal();
+                loadPipeline();
+
+                alert('Deal stage updated successfully!');
+            } catch (error) {
+                console.error('Error updating deal stage:', error);
+                alert('Error updating deal stage. Please try again.');
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Save Stage';
+            }
+        }
+
         // Close modals on escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 closeViewModal();
                 closeStatusModal();
                 closeDeleteModal();
+                closeLogCallModal();
+                closeViewDealModal();
+                closeDealStageModal();
             }
         });
     </script>
